@@ -31,9 +31,11 @@
 </script>
 
 <script>
-/* Photo loader: sized version first, then the original file, then a plain green block. */
+/* Photo loader: responsive thumbnails first, then a mid-size thumbnail, then the original file, then a plain green block. */
 function phErr(img){
-  if(!img.dataset.tried && img.dataset.orig){img.dataset.tried='1';img.src=img.dataset.orig;return}
+  var step=+img.dataset.step||0;img.dataset.step=step+1;
+  if(step===0&&img.dataset.mid){img.removeAttribute('srcset');img.src=img.dataset.mid;return}
+  if(step<=1&&img.dataset.orig){img.removeAttribute('srcset');img.src=img.dataset.orig;return}
   img.style.display='none';
   var p=img.closest('.ph');if(p)p.classList.add('noimg');
 }
@@ -50,7 +52,7 @@ function phErr(img){
   --serif:'Newsreader','Noto Serif SC',Georgia,'Times New Roman',serif;
   --sans:'Public Sans','Noto Sans SC',system-ui,-apple-system,'Segoe UI',sans-serif;
   --wrap:1180px;
-  --section:clamp(72px,9vw,120px);
+  --section:clamp(56px,8vw,112px);
   --head:84px;
 }
 *,*::before,*::after{box-sizing:border-box}
@@ -69,7 +71,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 /* Type */
 .display{font-family:var(--serif);font-weight:500;line-height:1.12;letter-spacing:-.012em}
 html[lang="zh-CN"] .display{font-weight:600;letter-spacing:0;line-height:1.3}
-.h2{font-size:clamp(2rem,3.6vw,3.1rem)}
+.h2{font-size:clamp(1.75rem,3.6vw,3.1rem)}
 .lead{font-size:1.125rem;line-height:1.75;max-width:58ch}
 
 /* Buttons */
@@ -112,17 +114,17 @@ figcaption{margin-top:12px;font-size:.84rem;line-height:1.5;color:var(--muted)}
 /* Hero: full-bleed photograph, text on a solid panel */
 .hero{position:relative;display:flex;align-items:flex-end;min-height:min(88vh,820px);padding-top:var(--head)}
 .hero>.ph{position:absolute;inset:0}
-.hero>.ph img{object-position:50% 55%}
+.hero>.ph img{object-position:50% 55%;filter:contrast(1.07) saturate(1.1)}
 .hero .wrap{position:relative}
 .hero-card{background:var(--green);color:#fff;max-width:660px;padding:clamp(30px,4.2vw,58px);border-top:4px solid var(--orange)}
-.hero h1{font-size:clamp(2.5rem,5.2vw,4.3rem);line-height:1.06;letter-spacing:-.02em;font-weight:500}
+.hero h1{font-size:clamp(2.15rem,4.8vw,3.9rem);line-height:1.08;letter-spacing:-.02em;font-weight:500}
 html[lang="zh-CN"] .hero h1{letter-spacing:0;line-height:1.22;font-weight:600}
 .hero .lead{margin-top:22px;color:var(--on-green-muted);font-size:1.08rem}
 .hero .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
 
 /* Five reasons */
 .reasons{padding:clamp(60px,8vw,96px) 0}
-.reasons .intro{font-size:clamp(1.6rem,2.8vw,2.3rem);max-width:30ch;margin-bottom:48px}
+.reasons .intro{font-size:clamp(1.45rem,2.8vw,2.3rem);max-width:30ch;margin-bottom:48px}
 .reason-row{display:grid;grid-template-columns:repeat(5,1fr);gap:28px}
 .reason{border-top:2px solid var(--green);padding-top:18px}
 .reason h3{font-size:1.02rem;font-weight:700;line-height:1.35}
@@ -154,10 +156,10 @@ html[lang="zh-CN"] .hero h1{letter-spacing:0;line-height:1.22;font-weight:600}
 .services .head{margin-bottom:12px}
 .services .head .lead{margin-top:16px;color:var(--muted)}
 .services .ph{aspect-ratio:4/5}
-.svc-list{margin-top:36px;border-top:1px solid var(--ink)}
-.svc-list article{padding:30px 0;border-bottom:1px solid var(--line)}
-.svc-list h3{font-size:1.6rem;line-height:1.2}
-.svc-list ul{margin-top:14px}
+.svc-list{margin-top:36px}
+.svc-list summary h3{font-size:1.45rem;line-height:1.25}
+.svc-list .body{padding:0 44px 26px 0}
+.svc-list ul{margin-top:0}
 .svc-list li{position:relative;padding:5px 0 5px 24px;color:#2B3945}
 .svc-list li::before{content:"";position:absolute;left:0;top:.95em;width:12px;height:2px;background:var(--leaf)}
 .svc-list .fine{margin-top:12px;font-size:.88rem;color:var(--muted)}
@@ -196,34 +198,25 @@ html[lang="zh-CN"] .hero h1{letter-spacing:0;line-height:1.22;font-weight:600}
 /* FAQ */
 .faq{padding:var(--section) 0}
 .faq .split{grid-template-columns:4fr 8fr}
-details{border-bottom:1px solid var(--line)}
-details:first-of-type{border-top:1px solid var(--ink)}
-summary{list-style:none;cursor:pointer;padding:22px 44px 22px 0;font-weight:600;font-size:1.06rem;position:relative;line-height:1.4}
-summary::-webkit-details-marker{display:none}
-summary::after{content:"";position:absolute;right:6px;top:50%;width:11px;height:11px;border-right:2px solid var(--green-2);border-bottom:2px solid var(--green-2);transform:translateY(-70%) rotate(45deg);transition:transform .25s}
-details[open] summary::after{transform:translateY(-30%) rotate(-135deg)}
-details p{padding:0 44px 24px 0;color:var(--muted);max-width:62ch}
+.acc-list{border-top:1px solid var(--ink)}
+.acc{border-bottom:1px solid var(--line)}
+.acc summary{list-style:none;cursor:pointer;position:relative;padding:22px 44px 22px 0;line-height:1.4}
+.acc summary::-webkit-details-marker{display:none}
+.acc summary::after{content:"";position:absolute;right:6px;top:50%;width:11px;height:11px;border-right:2px solid var(--green-2);border-bottom:2px solid var(--green-2);transform:translateY(-70%) rotate(45deg);transition:transform .25s}
+.acc[open] summary::after{transform:translateY(-30%) rotate(-135deg)}
+.faq .acc summary{font-weight:600;font-size:1.06rem}
+.faq .acc p{padding:0 44px 24px 0;color:var(--muted);max-width:62ch}
 
 /* Contact */
 .contact{background:var(--soft);padding:var(--section) 0}
-.contact .split{grid-template-columns:5fr 7fr}
+.contact .split{grid-template-columns:6fr 5fr;align-items:center}
 .contact .lead{margin-top:16px;color:var(--muted)}
-.reach{margin-top:34px;border-top:1px solid var(--ink)}
+.reach{border-top:1px solid var(--ink);align-self:start}
 .reach a,.reach div.item{display:block;padding:16px 0;border-bottom:1px solid var(--line);text-decoration:none}
 .reach small{display:block;font-size:.8rem;color:var(--muted);line-height:1.3}
 .reach .v{font-weight:600;font-size:1.1rem}
 .reach a:hover .v{color:var(--green-2)}
-.wa{margin-top:26px}
-form.enq{background:#fff;border:1px solid var(--line);padding:clamp(24px,3.4vw,42px);display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.field{display:flex;flex-direction:column;gap:7px}
-.field.full{grid-column:1/-1}
-label{font-size:.86rem;font-weight:600}
-input,select,textarea{width:100%;background:#fff;border:1px solid #BFCBC5;border-radius:2px;padding:13px 14px;transition:border-color .2s,box-shadow .2s}
-input:hover,select:hover,textarea:hover{border-color:#8FA399}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green-2);box-shadow:0 0 0 3px rgba(20,87,63,.16)}
-textarea{min-height:130px;resize:vertical}
-.form-foot{grid-column:1/-1;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-.form-foot p{font-size:.84rem;color:var(--muted);flex:1;min-width:200px}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
 
 /* Footer */
 footer{padding:56px 0 32px;border-top:1px solid var(--line)}
@@ -245,34 +238,64 @@ html[lang="zh-CN"] .foot-tag{font-weight:600;font-size:1.05rem}
   .steps{grid-template-columns:repeat(2,1fr);row-gap:40px}
 }
 @media (max-width:960px){
+  .why h2{max-width:none}
+  .reasons .intro{max-width:none}
   .burger{display:block}
   .head-cta{display:none}
   .nav{position:fixed;top:var(--head);left:0;right:0;flex-direction:column;align-items:stretch;gap:0;background:#fff;padding:6px 24px 22px;border-bottom:1px solid var(--line);box-shadow:0 16px 28px rgba(15,29,42,.12);transform:translateY(-12px);opacity:0;visibility:hidden;transition:opacity .25s,transform .25s,visibility .25s}
   .nav.open{opacity:1;transform:none;visibility:visible}
   .nav a.link{padding:16px 0;border-bottom:1px solid var(--line);font-size:1.02rem}
-  .why .split,.services .split,.model .split,.faq .split,.contact .split{grid-template-columns:1fr}
+  .why .split,.services .split,.model .split,.faq .split,.contact .split{grid-template-columns:1fr;gap:34px}
   .sticky{position:static}
-  .why .ph,.services .ph{aspect-ratio:3/2}
-  .services .media{order:2}
+  .why figure,.services figure{order:-1}
+  .why .ph,.services .ph,.model .ph{aspect-ratio:16/10}
   .hero{display:block;min-height:0}
-  .hero>.ph{position:relative;height:46vh;min-height:260px}
-  .hero .wrap{width:100%}
-  .hero-card{max-width:none;margin-top:0}
-  .hero-card{padding-left:24px;padding-right:24px}
+  .hero>.ph{position:relative;width:100%;aspect-ratio:4/3;max-height:60vh}
+  .hero .wrap{width:auto;margin:-64px 20px 0}
+  .hero-card{max-width:none;padding:30px 24px 34px}
+  .hero .cta .btn{flex:1 1 220px}
   .vision{display:block;min-height:0;padding:0}
-  .vision>.ph{position:relative;height:300px}
-  .vision .wrap{width:100%;display:block}
+  .vision>.ph{position:relative;aspect-ratio:16/10}
+  .vision .wrap{width:auto;margin:-48px 20px 0;display:block}
   .vision-card{max-width:none}
+  .reasons{padding-bottom:var(--section)}
 }
 @media (max-width:640px){
+  :root{--head:68px}
+  body{font-size:16px}
   .wrap{width:min(var(--wrap),100% - 36px)}
-  .reason-row{grid-template-columns:1fr 1fr;column-gap:20px}
-  .steps{grid-template-columns:1fr}
+  .logo img{height:42px}
+  .lang{padding:8px 12px}
+  .hero .wrap,.vision .wrap{margin-left:16px;margin-right:16px}
+  .hero-card{padding:26px 22px 30px}
+  .hero .lead{font-size:1rem;margin-top:16px}
+  .hero .cta{margin-top:24px}
+  .hero .cta .btn{flex:1 1 100%}
+  .reasons .intro{margin-bottom:26px}
+  .reason-row{grid-template-columns:1fr;gap:0;border-top:1px solid var(--ink)}
+  .reason{border-top:0;border-bottom:1px solid var(--line);padding:16px 0}
+  .reason p{margin-top:4px}
+  .lead{font-size:1.02rem}
+  .row{grid-template-columns:1fr;gap:8px;padding:20px 0}
+  .row .num{font-size:2.1rem}
+  .sectors{margin-top:40px}
   .sector-list{grid-template-columns:1fr}
-  .row{grid-template-columns:1fr;gap:6px}
-  form.enq{grid-template-columns:1fr}
-  .logo img{height:48px}
-  .foot-tag{flex-direction:column;align-items:flex-start}
+  .process .head{margin-bottom:26px}
+  .steps{grid-template-columns:1fr;gap:0}
+  .step{display:grid;grid-template-columns:44px 1fr;column-gap:14px;padding:20px 0;border-top:1px solid var(--line)}
+  .step:first-child{border-top:2px solid var(--green)}
+  .step .no{grid-row:1/3;font-size:2rem}
+  .step h3{margin-top:2px}
+  .step p{margin-top:4px}
+  .acc summary{padding:18px 34px 18px 0}
+  .svc-list summary h3{font-size:1.2rem}
+  .svc-list .body,.faq .acc p{padding-right:0}
+  .term{padding:18px 0}
+  .term h3{font-size:1.2rem}
+  .cta-row .btn{width:100%}
+  .foot-top{flex-direction:column;align-items:flex-start;gap:20px}
+  .foot-tag{flex-direction:column;align-items:flex-start;gap:12px}
+  .foot-nav{gap:12px 22px}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -307,7 +330,7 @@ html[lang="zh-CN"] .foot-tag{font-weight:600;font-size:1.05rem}
 <!-- HERO -->
 <section class="hero" id="top">
   <div class="ph">
-    <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Aerial_View_of_Islamabad_from_Pir_Sohawa_Top.jpg?width=2000" data-orig="https://commons.wikimedia.org/wiki/Special:FilePath/Aerial_View_of_Islamabad_from_Pir_Sohawa_Top.jpg" alt="Aerial view of Islamabad" onerror="phErr(this)" fetchpriority="high" decoding="async">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Aerial_View_of_Islamabad_from_Pir_Sohawa_Top.jpg/1280px-Aerial_View_of_Islamabad_from_Pir_Sohawa_Top.jpg" srcset="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Aerial_View_of_Islamabad_from_Pir_Sohawa_Top.jpg/960px-Aerial_View_of_Islamabad_from_Pir_Sohawa_Top.jpg 960w, https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Aerial_View_of_Islamabad_from_Pir_Sohawa_Top.jpg/1280px-Aerial_View_of_Islamabad_from_Pir_Sohawa_Top.jpg 1280w, https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Aerial_View_of_Islamabad_from_Pir_Sohawa_Top.jpg/1920px-Aerial_View_of_Islamabad_from_Pir_Sohawa_Top.jpg 1920w" sizes="100vw" data-mid="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Aerial_View_of_Islamabad_from_Pir_Sohawa_Top.jpg/960px-Aerial_View_of_Islamabad_from_Pir_Sohawa_Top.jpg" data-orig="https://upload.wikimedia.org/wikipedia/commons/9/9c/Aerial_View_of_Islamabad_from_Pir_Sohawa_Top.jpg" alt="Aerial view of Islamabad" onerror="phErr(this)" fetchpriority="high" decoding="async">
   </div>
   <div class="wrap">
     <div class="hero-card">
@@ -392,7 +415,7 @@ html[lang="zh-CN"] .foot-tag{font-weight:600;font-size:1.05rem}
 
     <figure class="sticky">
       <div class="ph">
-        <img loading="lazy" decoding="async" src="https://commons.wikimedia.org/wiki/Special:FilePath/Monument_of_Khunjerab_Pass_at_Pak-China_border_on_Karakoram_Highway.jpg?width=1400" data-orig="https://commons.wikimedia.org/wiki/Special:FilePath/Monument_of_Khunjerab_Pass_at_Pak-China_border_on_Karakoram_Highway.jpg" alt="The monument at Khunjerab Pass on the Pakistan-China border" onerror="phErr(this)">
+        <img loading="lazy" decoding="async" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Monument_of_Khunjerab_Pass_at_Pak-China_border_on_Karakoram_Highway.jpg/960px-Monument_of_Khunjerab_Pass_at_Pak-China_border_on_Karakoram_Highway.jpg" srcset="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Monument_of_Khunjerab_Pass_at_Pak-China_border_on_Karakoram_Highway.jpg/500px-Monument_of_Khunjerab_Pass_at_Pak-China_border_on_Karakoram_Highway.jpg 500w, https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Monument_of_Khunjerab_Pass_at_Pak-China_border_on_Karakoram_Highway.jpg/960px-Monument_of_Khunjerab_Pass_at_Pak-China_border_on_Karakoram_Highway.jpg 960w, https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Monument_of_Khunjerab_Pass_at_Pak-China_border_on_Karakoram_Highway.jpg/1280px-Monument_of_Khunjerab_Pass_at_Pak-China_border_on_Karakoram_Highway.jpg 1280w" sizes="(max-width:960px) 92vw, 600px" data-mid="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Monument_of_Khunjerab_Pass_at_Pak-China_border_on_Karakoram_Highway.jpg/960px-Monument_of_Khunjerab_Pass_at_Pak-China_border_on_Karakoram_Highway.jpg" data-orig="https://upload.wikimedia.org/wikipedia/commons/8/81/Monument_of_Khunjerab_Pass_at_Pak-China_border_on_Karakoram_Highway.jpg" alt="The monument at Khunjerab Pass on the Pakistan-China border" onerror="phErr(this)">
       </div>
       <figcaption data-zh="红其拉甫口岸纪念碑：喀喇昆仑公路在此连接巴基斯坦与中国。">The monument at Khunjerab Pass, where the Karakoram Highway crosses between Pakistan and China.</figcaption>
     </figure>
@@ -404,7 +427,7 @@ html[lang="zh-CN"] .foot-tag{font-weight:600;font-size:1.05rem}
   <div class="wrap split">
     <figure class="sticky media">
       <div class="ph">
-        <img loading="lazy" decoding="async" src="https://commons.wikimedia.org/wiki/Special:FilePath/Blue_Area_Skyline.jpg?width=1400" data-orig="https://commons.wikimedia.org/wiki/Special:FilePath/Blue_Area_Skyline.jpg" alt="Skyline of the Blue Area, Islamabad's central business district" onerror="phErr(this)">
+        <img loading="lazy" decoding="async" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Blue_Area_Skyline.jpg/960px-Blue_Area_Skyline.jpg" srcset="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Blue_Area_Skyline.jpg/500px-Blue_Area_Skyline.jpg 500w, https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Blue_Area_Skyline.jpg/960px-Blue_Area_Skyline.jpg 960w, https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Blue_Area_Skyline.jpg/1280px-Blue_Area_Skyline.jpg 1280w" sizes="(max-width:960px) 92vw, 600px" data-mid="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Blue_Area_Skyline.jpg/960px-Blue_Area_Skyline.jpg" data-orig="https://upload.wikimedia.org/wikipedia/commons/4/47/Blue_Area_Skyline.jpg" alt="Skyline of the Blue Area, Islamabad's central business district" onerror="phErr(this)">
       </div>
       <figcaption data-zh="伊斯兰堡蓝区，首都的中央商务区。">The Blue Area, Islamabad's central business district.</figcaption>
     </figure>
@@ -415,73 +438,72 @@ html[lang="zh-CN"] .foot-tag{font-weight:600;font-size:1.05rem}
         <p class="lead" data-zh="七大服务领域，覆盖进入、运营与拓展巴基斯坦市场的全过程。">Seven areas of support that cover entering, running and growing a business in Pakistan.</p>
       </div>
 
-      <div class="svc-list">
-        <article>
-          <h3 class="display" data-zh="政府与监管事务协调">Government &amp; Regulatory Coordination</h3>
-          <ul>
+      <div class="svc-list acc-list">
+        <details class="acc" open>
+          <summary><h3 class="display" data-zh="政府与监管事务协调">Government &amp; Regulatory Coordination</h3></summary>
+          <div class="body"><ul>
             <li data-zh="与相关政府部门和主管机构联络">Liaison with relevant government departments and authorities</li>
             <li data-zh="协助办理注册、许可证、批文及合规事宜">Assistance with registrations, licences, permits and compliance</li>
             <li data-zh="协助安排官方会议并跟进落实">Facilitation of official meetings and follow-ups</li>
           </ul>
-          <p class="more"><a class="tlink" href="#contact" data-service="Government & Regulatory Coordination" data-zh="咨询此项服务">Enquire about this service</a></p>
-        </article>
-        <article>
-          <h3 class="display" data-zh="市场调研与业务拓展">Market Research &amp; Business Development</h3>
-          <ul>
+            <p class="more"><a class="tlink" href="mailto:sajid.iqbal66@gmail.com?subject=Enquiry%3A%20Government%20%26%20Regulatory%20Coordination" data-zh="咨询此项服务">Enquire about this service</a></p></div>
+        </details>
+        <details class="acc">
+          <summary><h3 class="display" data-zh="市场调研与业务拓展">Market Research &amp; Business Development</h3></summary>
+          <div class="body"><ul>
             <li data-zh="市场分析与商机识别">Market analysis and opportunity identification</li>
             <li data-zh="寻找客户、分销商、供应商及合作伙伴">Finding customers, distributors, suppliers and partners</li>
             <li data-zh="本地销售拓展与市场进入支持">Local sales development and market-entry support</li>
           </ul>
-          <p class="more"><a class="tlink" href="#contact" data-service="Market Research & Business Development" data-zh="咨询此项服务">Enquire about this service</a></p>
-        </article>
-        <article>
-          <h3 class="display" data-zh="本地行政与运营支持">Local Administration &amp; Operational Support</h3>
-          <ul>
+            <p class="more"><a class="tlink" href="mailto:sajid.iqbal66@gmail.com?subject=Enquiry%3A%20Market%20Research%20%26%20Business%20Development" data-zh="咨询此项服务">Enquire about this service</a></p></div>
+        </details>
+        <details class="acc">
+          <summary><h3 class="display" data-zh="本地行政与运营支持">Local Administration &amp; Operational Support</h3></summary>
+          <div class="body"><ul>
             <li data-zh="办公室设立与行政安排">Office establishment and admin arrangements</li>
             <li data-zh="招聘与人力资源协调">Recruitment and HR coordination</li>
             <li data-zh="办公场地、仓库及设施">Office space, warehouses and facilities</li>
             <li data-zh="与本地服务商协调">Coordination with local service providers</li>
           </ul>
-          <p class="more"><a class="tlink" href="#contact" data-service="Local Administration & Operational Support" data-zh="咨询此项服务">Enquire about this service</a></p>
-        </article>
-        <article>
-          <h3 class="display" data-zh="商务网络与机构关系">Business Networking &amp; Institutional Relations</h3>
-          <ul>
+            <p class="more"><a class="tlink" href="mailto:sajid.iqbal66@gmail.com?subject=Enquiry%3A%20Local%20Administration%20%26%20Operational%20Support" data-zh="咨询此项服务">Enquire about this service</a></p></div>
+        </details>
+        <details class="acc">
+          <summary><h3 class="display" data-zh="商务网络与机构关系">Business Networking &amp; Institutional Relations</h3></summary>
+          <div class="body"><ul>
             <li data-zh="与商会及行业协会联络">Chamber of commerce and industry body liaison</li>
             <li data-zh="B2B 会谈与商务代表团接待">B2B meetings and business delegations</li>
             <li data-zh="与重要机构及利益相关方建立关系">Building relationships with key institutions and stakeholders</li>
           </ul>
-          <p class="more"><a class="tlink" href="#contact" data-service="Business Networking & Institutional Relations" data-zh="咨询此项服务">Enquire about this service</a></p>
-        </article>
-        <article>
-          <h3 class="display" data-zh="采购、物流与供应链支持">Procurement, Logistics &amp; Supply Chain Support</h3>
-          <ul>
+            <p class="more"><a class="tlink" href="mailto:sajid.iqbal66@gmail.com?subject=Enquiry%3A%20Business%20Networking%20%26%20Institutional%20Relations" data-zh="咨询此项服务">Enquire about this service</a></p></div>
+        </details>
+        <details class="acc">
+          <summary><h3 class="display" data-zh="采购、物流与供应链支持">Procurement, Logistics &amp; Supply Chain Support</h3></summary>
+          <div class="body"><ul>
             <li data-zh="本地供应商与制造商">Local suppliers and manufacturers</li>
             <li data-zh="采购与运输">Procurement and transportation</li>
             <li data-zh="仓储与物流">Warehousing and logistics</li>
             <li data-zh="清关与货运协调">Customs and freight coordination</li>
           </ul>
-          <p class="more"><a class="tlink" href="#contact" data-service="Procurement, Logistics & Supply Chain Support" data-zh="咨询此项服务">Enquire about this service</a></p>
-        </article>
-        <article>
-          <h3 class="display" data-zh="法律、税务与财务服务协调">Legal, Tax &amp; Financial Services Coordination</h3>
-          <ul>
+            <p class="more"><a class="tlink" href="mailto:sajid.iqbal66@gmail.com?subject=Enquiry%3A%20Procurement%2C%20Logistics%20%26%20Supply%20Chain%20Support" data-zh="咨询此项服务">Enquire about this service</a></p></div>
+        </details>
+        <details class="acc">
+          <summary><h3 class="display" data-zh="法律、税务与财务服务协调">Legal, Tax &amp; Financial Services Coordination</h3></summary>
+          <div class="body"><ul>
             <li data-zh="律师、税务顾问及会计师（本地合作伙伴）">Lawyers, tax consultants and accountants (local partners)</li>
             <li data-zh="税务、公司及用工合规指导">Guidance on tax, corporate and employment compliance</li>
             <li data-zh="转介合格专业人士">Referral to qualified professionals</li>
           </ul>
-          <p class="fine" data-zh="TechKnow 负责协调，专业意见由合格的本地专业人士提供。">TechKnow coordinates; professional advice is given by qualified local professionals.</p>
-          <p class="more"><a class="tlink" href="#contact" data-service="Legal, Tax & Financial Services Coordination" data-zh="咨询此项服务">Enquire about this service</a></p>
-        </article>
-        <article>
-          <h3 class="display" data-zh="项目与投资促进">Project &amp; Investment Facilitation</h3>
-          <ul>
+            <p class="fine" data-zh="TechKnow 负责协调，专业意见由合格的本地专业人士提供。">TechKnow coordinates; professional advice is given by qualified local professionals.</p><p class="more"><a class="tlink" href="mailto:sajid.iqbal66@gmail.com?subject=Enquiry%3A%20Legal%2C%20Tax%20%26%20Financial%20Services%20Coordination" data-zh="咨询此项服务">Enquire about this service</a></p></div>
+        </details>
+        <details class="acc">
+          <summary><h3 class="display" data-zh="项目与投资促进">Project &amp; Investment Facilitation</h3></summary>
+          <div class="body"><ul>
             <li data-zh="投资机会与合资伙伴">Investment opportunities and joint-venture partners</li>
             <li data-zh="项目协调与实施支持">Project coordination and implementation support</li>
             <li data-zh="工业及商业选址协助">Industrial and commercial location assistance</li>
           </ul>
-          <p class="more"><a class="tlink" href="#contact" data-service="Project & Investment Facilitation" data-zh="咨询此项服务">Enquire about this service</a></p>
-        </article>
+            <p class="more"><a class="tlink" href="mailto:sajid.iqbal66@gmail.com?subject=Enquiry%3A%20Project%20%26%20Investment%20Facilitation" data-zh="咨询此项服务">Enquire about this service</a></p></div>
+        </details>
       </div>
     </div>
   </div>
@@ -542,9 +564,9 @@ html[lang="zh-CN"] .foot-tag{font-weight:600;font-size:1.05rem}
     </div>
     <figure>
       <div class="ph">
-        <img loading="lazy" decoding="async" src="https://commons.wikimedia.org/wiki/Special:FilePath/PK_Karachi_asv2020-02_img47_container_port.jpg?width=1400" data-orig="https://commons.wikimedia.org/wiki/Special:FilePath/PK_Karachi_asv2020-02_img47_container_port.jpg" alt="Container port in Karachi" onerror="phErr(this)">
+        <img loading="lazy" decoding="async" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Gwadar_Port.jpg/960px-Gwadar_Port.jpg" srcset="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Gwadar_Port.jpg/500px-Gwadar_Port.jpg 500w, https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Gwadar_Port.jpg/960px-Gwadar_Port.jpg 960w, https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Gwadar_Port.jpg/1280px-Gwadar_Port.jpg 1280w" sizes="(max-width:960px) 92vw, 600px" data-mid="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Gwadar_Port.jpg/960px-Gwadar_Port.jpg" data-orig="https://upload.wikimedia.org/wikipedia/commons/0/0e/Gwadar_Port.jpg" alt="Gwadar Port on the Arabian Sea" onerror="phErr(this)">
       </div>
-      <figcaption data-zh="卡拉奇港集装箱码头，巴基斯坦海运贸易的主要门户。">Container terminal at Karachi, Pakistan's main gateway for sea trade.</figcaption>
+      <figcaption data-zh="阿拉伯海畔的瓜达尔港，是中巴经济走廊的门户之一。">Gwadar Port on the Arabian Sea, one of the gateways of the China-Pakistan Economic Corridor.</figcaption>
     </figure>
   </div>
 </section>
@@ -552,7 +574,7 @@ html[lang="zh-CN"] .foot-tag{font-weight:600;font-size:1.05rem}
 <!-- VISION -->
 <section class="vision" aria-labelledby="vision-h">
   <div class="ph">
-    <img loading="lazy" decoding="async" src="https://commons.wikimedia.org/wiki/Special:FilePath/Faisal_Mosque_-_ISB.jpg?width=2000" data-orig="https://commons.wikimedia.org/wiki/Special:FilePath/Faisal_Mosque_-_ISB.jpg" alt="Faisal Mosque, Islamabad" onerror="phErr(this)">
+    <img loading="lazy" decoding="async" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Faisal_Mosque_-_ISB.jpg/960px-Faisal_Mosque_-_ISB.jpg" srcset="https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Faisal_Mosque_-_ISB.jpg/500px-Faisal_Mosque_-_ISB.jpg 500w, https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Faisal_Mosque_-_ISB.jpg/960px-Faisal_Mosque_-_ISB.jpg 960w, https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Faisal_Mosque_-_ISB.jpg/1280px-Faisal_Mosque_-_ISB.jpg 1280w" sizes="(max-width:960px) 92vw, 600px" data-mid="https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Faisal_Mosque_-_ISB.jpg/960px-Faisal_Mosque_-_ISB.jpg" data-orig="https://upload.wikimedia.org/wikipedia/commons/9/94/Faisal_Mosque_-_ISB.jpg" alt="Faisal Mosque, Islamabad" onerror="phErr(this)">
   </div>
   <div class="wrap">
     <div class="vision-card">
@@ -567,26 +589,26 @@ html[lang="zh-CN"] .foot-tag{font-weight:600;font-size:1.05rem}
 <section class="faq" id="faq" aria-labelledby="faq-h">
   <div class="wrap split">
     <h2 id="faq-h" class="display h2" data-zh="常见问题">Questions companies ask first</h2>
-    <div>
-      <details>
+    <div class="acc-list">
+      <details class="acc">
         <summary data-zh="与你们合作是否需要先在巴基斯坦注册公司？">Do we need to register a company in Pakistan to work with you?</summary>
         <p data-zh="不需要。您可以先将 TechKnow 作为您的本地办事处。如果后续业务需要设立注册实体，我们将联合合格的法律合作伙伴协调办理。">No. You can start with TechKnow as your local desk. If your plans later call for a registered presence, we coordinate the process with qualified legal partners.</p>
       </details>
-      <details>
+      <details class="acc">
         <summary data-zh="外国公司在巴基斯坦可以采用哪些本地存在形式？">What kinds of local presence can a foreign company have?</summary>
         <p data-zh="一般有三种：用于代表与市场调研的联络办事处、用于履行合同的分公司，以及在当地注册成立的子公司。外国公司注册通常需先取得投资委员会（BOI）许可，再向证券交易委员会（SECP）注册。具体要求因行业而异且可能调整，我们会转介合格律师确认最合适的结构。">Generally three: a liaison office for representation and market research, a branch office to carry out contracts, or a locally incorporated subsidiary. Foreign-company registration usually involves Board of Investment permission followed by SECP registration. Requirements vary by sector and change over time, so we refer you to qualified lawyers to confirm the right structure.</p>
       </details>
-      <details>
+      <details class="acc">
         <summary data-zh="你们提供法律和税务意见吗？">Do you provide legal and tax advice?</summary>
         <p data-zh="TechKnow 负责协调。法律、税务及会计意见由我们合作网络中的合格本地专业人士提供，我们统筹整个流程，您只需对接一位联系人。">TechKnow coordinates. Legal, tax and accounting advice comes from qualified local professionals in our partner network, and we manage the process so you deal with one contact.</p>
       </details>
-      <details>
+      <details class="acc">
         <summary data-zh="你们的费用如何收取？">How are your fees structured?</summary>
         <p data-zh="我们根据贵公司的需求提供灵活的服务方案：月度服务协议、按项目签订的合同，或单独商定的服务费用。">Flexible packages based on your company's needs: monthly service agreements, project-based contracts, or individually agreed fees.</p>
       </details>
-      <details>
+      <details class="acc">
         <summary data-zh="如何开始合作？">How do we get started?</summary>
-        <p data-zh="通过下方表单、电子邮件或 WhatsApp 发送简要说明，告知您的行业、在巴基斯坦的计划及时间安排，我们将回复下一步安排。">Send a short brief through the form below, by email, or on WhatsApp. Tell us your sector, what you want to do in Pakistan and your timeline, and we will reply with the next step.</p>
+        <p data-zh="通过电子邮件、电话或 WhatsApp 发送简要说明，告知您的行业、在巴基斯坦的计划及时间安排，我们将回复下一步安排。">Send a short brief by email, phone or WhatsApp. Tell us your sector, what you want to do in Pakistan and your timeline, and we will reply with the next step.</p>
       </details>
     </div>
   </div>
@@ -597,54 +619,17 @@ html[lang="zh-CN"] .foot-tag{font-weight:600;font-size:1.05rem}
   <div class="wrap split">
     <div>
       <h2 id="contact-h" class="display h2" data-zh="告诉我们您在巴基斯坦的计划。">Tell us what you plan to do in Pakistan.</h2>
-      <p class="lead" data-zh="发送简要说明，我们将回复下一步安排。">Send a short brief and we will reply with the next step.</p>
-      <div class="reach">
-        <a href="tel:+923214702058"><small data-zh="电话">Phone</small><span class="v">+92 321 4702058</span></a>
-        <a href="mailto:sajid.iqbal66@gmail.com"><small data-zh="电子邮件">Email</small><span class="v">sajid.iqbal66@gmail.com</span></a>
-        <div class="item"><small data-zh="办公地点">Office</small><span class="v" data-zh="巴基斯坦伊斯兰堡">Islamabad, Pakistan</span></div>
+      <p class="lead" data-zh="请致电、发送邮件或通过 WhatsApp 联系我们，简要说明您的计划，我们将回复下一步安排。">Call, email or message us on WhatsApp with a short outline of your plans, and we will reply with the next step.</p>
+      <div class="cta-row">
+        <a class="btn btn-green" href="mailto:sajid.iqbal66@gmail.com?subject=Enquiry%20from%20website" data-zh="发送邮件">Send an email</a>
+        <a class="btn btn-outline" href="https://wa.me/923214702058" target="_blank" rel="noopener" data-zh="通过 WhatsApp 联系">Message on WhatsApp</a>
       </div>
-      <a class="btn btn-outline wa" href="https://wa.me/923214702058" target="_blank" rel="noopener" data-zh="通过 WhatsApp 联系">Message on WhatsApp</a>
     </div>
-
-    <form class="enq" id="enq" novalidate>
-      <div class="field">
-        <label for="f-name" data-zh="姓名">Name</label>
-        <input id="f-name" name="name" autocomplete="name" required>
-      </div>
-      <div class="field">
-        <label for="f-company" data-zh="公司">Company</label>
-        <input id="f-company" name="company" autocomplete="organization">
-      </div>
-      <div class="field">
-        <label for="f-email" data-zh="电子邮件">Email</label>
-        <input id="f-email" name="email" type="email" autocomplete="email" required>
-      </div>
-      <div class="field">
-        <label for="f-phone" data-zh="电话 / 微信">Phone or WeChat</label>
-        <input id="f-phone" name="phone" autocomplete="tel">
-      </div>
-      <div class="field full">
-        <label for="f-service" data-zh="感兴趣的服务">Service you are interested in</label>
-        <select id="f-service" name="service">
-          <option value="General enquiry" data-zh="一般咨询">General enquiry</option>
-          <option value="Government & Regulatory Coordination" data-zh="政府与监管事务协调">Government &amp; Regulatory Coordination</option>
-          <option value="Market Research & Business Development" data-zh="市场调研与业务拓展">Market Research &amp; Business Development</option>
-          <option value="Local Administration & Operational Support" data-zh="本地行政与运营支持">Local Administration &amp; Operational Support</option>
-          <option value="Business Networking & Institutional Relations" data-zh="商务网络与机构关系">Business Networking &amp; Institutional Relations</option>
-          <option value="Procurement, Logistics & Supply Chain Support" data-zh="采购、物流与供应链支持">Procurement, Logistics &amp; Supply Chain Support</option>
-          <option value="Legal, Tax & Financial Services Coordination" data-zh="法律、税务与财务服务协调">Legal, Tax &amp; Financial Services Coordination</option>
-          <option value="Project & Investment Facilitation" data-zh="项目与投资促进">Project &amp; Investment Facilitation</option>
-        </select>
-      </div>
-      <div class="field full">
-        <label for="f-msg" data-zh="您的计划">Your plans</label>
-        <textarea id="f-msg" name="message"></textarea>
-      </div>
-      <div class="form-foot">
-        <button class="btn btn-green" type="submit" data-zh="发送咨询">Send enquiry</button>
-        <p data-zh="将打开您的邮件应用，并生成待发送的邮件。">This opens your email app with the message ready to send.</p>
-      </div>
-    </form>
+    <div class="reach">
+      <a href="tel:+923214702058"><small data-zh="电话">Phone</small><span class="v">+92 321 4702058</span></a>
+      <a href="mailto:sajid.iqbal66@gmail.com"><small data-zh="电子邮件">Email</small><span class="v">sajid.iqbal66@gmail.com</span></a>
+      <div class="item"><small data-zh="办公地点">Office</small><span class="v" data-zh="巴基斯坦伊斯兰堡">Islamabad, Pakistan</span></div>
+    </div>
   </div>
 </section>
 
@@ -671,7 +656,7 @@ html[lang="zh-CN"] .foot-tag{font-weight:600;font-size:1.05rem}
       <a href="https://commons.wikimedia.org/wiki/File:Aerial_View_of_Islamabad_from_Pir_Sohawa_Top.jpg" target="_blank" rel="noopener">Islamabad</a>,
       <a href="https://commons.wikimedia.org/wiki/File:Monument_of_Khunjerab_Pass_at_Pak-China_border_on_Karakoram_Highway.jpg" target="_blank" rel="noopener">Khunjerab Pass</a>,
       <a href="https://commons.wikimedia.org/wiki/File:Blue_Area_Skyline.jpg" target="_blank" rel="noopener">Blue Area</a>,
-      <a href="https://commons.wikimedia.org/wiki/File:PK_Karachi_asv2020-02_img47_container_port.jpg" target="_blank" rel="noopener">Karachi port</a>,
+      <a href="https://commons.wikimedia.org/wiki/File:Gwadar_Port.jpg" target="_blank" rel="noopener">Gwadar Port</a>,
       <a href="https://commons.wikimedia.org/wiki/File:Faisal_Mosque_-_ISB.jpg" target="_blank" rel="noopener">Faisal Mosque</a>.
     </p>
     <p class="copy">&copy; 2026 TechKnow Consultants. Islamabad, Pakistan.</p>
@@ -691,11 +676,12 @@ html[lang="zh-CN"] .foot-tag{font-weight:600;font-size:1.05rem}
   nav.querySelectorAll('a').forEach(function(a){a.addEventListener('click',closeMenu)});
   document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMenu()});
 
-  /* "Enquire about this service" pre-selects the form option */
-  var sel=document.getElementById('f-service');
-  document.querySelectorAll('[data-service]').forEach(function(a){
-    a.addEventListener('click',function(){sel.value=a.getAttribute('data-service')});
-  });
+  /* services accordion: all open on desktop, first open on mobile */
+  var mq=window.matchMedia('(min-width:961px)');
+  function syncSvc(){document.querySelectorAll('.svc-list details').forEach(function(d,i){d.open=mq.matches?true:(i===0)})}
+  syncSvc();
+  if(mq.addEventListener){mq.addEventListener('change',syncSvc)}else if(mq.addListener){mq.addListener(syncSvc)}
+
 
   /* language toggle */
   var nodes=[].slice.call(document.querySelectorAll('[data-zh]'));
@@ -719,27 +705,6 @@ html[lang="zh-CN"] .foot-tag{font-weight:600;font-size:1.05rem}
   if(initial==='zh')setLang('zh');
   langBtn.addEventListener('click',function(){setLang(document.documentElement.lang==='en'?'zh':'en')});
 
-  /* enquiry form (opens the visitor's email app) */
-  var form=document.getElementById('enq');
-  form.addEventListener('submit',function(e){
-    e.preventDefault();
-    var f=form.elements;
-    if(!f.name.value.trim()||!f.email.value.trim()){
-      (f.name.value.trim()?f.email:f.name).focus();
-      return;
-    }
-    var lines=[
-      'Name: '+f.name.value.trim(),
-      'Company: '+f.company.value.trim(),
-      'Email: '+f.email.value.trim(),
-      'Phone / WeChat: '+f.phone.value.trim(),
-      'Service: '+f.service.value,
-      '',
-      f.message.value.trim()
-    ];
-    var subject='Website enquiry: '+f.service.value+(f.company.value.trim()?' ('+f.company.value.trim()+')':'');
-    window.location.href='mailto:sajid.iqbal66@gmail.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(lines.join('\n'));
-  });
 })();
 </script>
 </body>
